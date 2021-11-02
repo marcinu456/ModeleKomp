@@ -23,8 +23,8 @@ void APendulum::BeginPlay()
 	Super::BeginPlay();
 	double M_PI = 3.1415926535897932384626433832795;
 	auto Frector = GetActorLocation();
-	px = Frector.X;
-	py = Frector.Y;
+	px = Frector.Y;
+	py = Frector.Z;
 	theta0 = M_PI / 2.0 + 0.15;
 	length0 = 150;
 	mass0 = 1;
@@ -89,10 +89,10 @@ void APendulum::computePosition()
 	y1 = y0 + length1 * FMath::Cos(theta1);
 	auto Frector = GetActorLocation();
 	FVector StarPos1 = { Frector.X, px,py, };
-	FVector EndPos1 = { Frector.X + 150, x0, y0, };
+	FVector EndPos1 = { Frector.X, x0, y0, };
 
 	//FVector StarPos2 = { x0, y0,Frector.Z+150 };
-	FVector EndPos2 = { Frector.X+ 300,x1, x1, };
+	FVector EndPos2 = { Frector.X,x1, y1, };
 
 	TArray<FVector> Path;
 	Path.Add(StarPos1);
@@ -129,9 +129,10 @@ void APendulum::computePosition()
 		SplineMesh->SetVisibility(true);
 
 		FVector StarPos, StartTangent, EndPos, EndTangent;
+		FVector Tangent = { 0,0,0 };
 		FirstColumn->GetLocalLocationAndTangentAtSplinePoint(i, StarPos, StartTangent);
 		FirstColumn->GetLocalLocationAndTangentAtSplinePoint(i + 1, EndPos, EndTangent);
-		SplineMesh->SetStartAndEnd(StarPos, StartTangent, EndPos, EndTangent);
+		SplineMesh->SetStartAndEnd(StarPos, Tangent, EndPos, Tangent);
 
 	}
 
