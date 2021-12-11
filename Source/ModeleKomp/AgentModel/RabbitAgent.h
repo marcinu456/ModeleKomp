@@ -27,10 +27,18 @@ private:
 	const size_t RABBIT_MAX_HP = 300;
 	const size_t RABBIT_MAX_HUNGRY_HP_LEVEL = 150;
 	const double RABBIT_VELOCITY = 2.5;
-	const double RABBIT_REPRODUCE_COUNT = 4;
+	const double RABBIT_REPRODUCE_COUNT = 1;
 
 	const double SIZE = 10;
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true", Category = "Grid Setup"))
 		TSubclassOf<ARabbitAgent> RabbitActor;
+
+	class APlantAgent* atractorPlant;
+	class ARabbitAgent* atractorRabbit;
+
+
+	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
+
+	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
 };

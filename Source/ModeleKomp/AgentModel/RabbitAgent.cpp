@@ -4,6 +4,7 @@
 #include "RabbitAgent.h"
 
 #include "PlantAgent.h"
+#include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 ARabbitAgent::ARabbitAgent()
@@ -11,6 +12,13 @@ ARabbitAgent::ARabbitAgent()
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->SetupAttachment(RootComponent);
+
+	Sphere1 = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
+	Sphere1->InitSphereRadius(100.0f);
+	Sphere1->SetupAttachment(RootComponent);
+
+	Sphere1->OnComponentBeginOverlap.AddDynamic(this, &ARabbitAgent::OnOverlapBegin);       // set up a notification for when this component overlaps something
+	Sphere1->OnComponentEndOverlap.AddDynamic(this, &ARabbitAgent::OnOverlapEnd);
 }
 
 void ARabbitAgent::Tick(float DeltaTime)
@@ -48,12 +56,14 @@ void ARabbitAgent::Move()
 			SetActorLocation(GetActorLocation() + atractor / atractortDist * RABBIT_VELOCITY);
 			//UE_LOG(LogTemp, Warning, TEXT("Some warning message"));
 
-			if ((GetActorLocation() - Plants[atractorIndex]->GetActorLocation()).Size() < SIZE) {
-				Plants[atractorIndex]->Destroy();
-				Plants.RemoveAt(atractorIndex);
+			atractorPlant = Cast<APlantAgent>(Plants[atractorIndex]);
 
-				hp = RABBIT_MAX_HP;
-			}
+			//if ((GetActorLocation() - Plants[atractorIndex]->GetActorLocation()).Size() < SIZE) {
+			//	Plants[atractorIndex]->Destroy();
+			//	Plants.RemoveAt(atractorIndex);
+			//
+			//	hp = RABBIT_MAX_HP;
+			//}
 
 		}
 	}
@@ -90,25 +100,9 @@ void ARabbitAgent::Move()
 		auto partner = Cast<ARabbitAgent>(Rabbits[atractorIndex]);
 		if (this != partner) {
 			SetActorLocation(GetActorLocation() + atractor / atractortDist * RABBIT_VELOCITY);
-			if ((GetActorLocation() - Rabbits[atractorIndex]->GetActorLocation()).Size() < SIZE) {
-				hp = RABBIT_MAX_HUNGRY_HP_LEVEL;
-				partner->hp = RABBIT_MAX_HUNGRY_HP_LEVEL;
-				for (int j = 0; j < RABBIT_REPRODUCE_COUNT; j++) {
 
-					TArray<UStaticMeshComponent*> Components;
+			atractorRabbit = partner;
 
-					RabbitActor.GetDefaultObject()->GetComponents<UStaticMeshComponent>(Components);
-					ensure(Components.Num() > 0);
-
-					const FVector Loc(GetActorLocation().X + FMath::RandRange(-500, 500), GetActorLocation().Y + FMath::RandRange(-500, 500), GetActorLocation().Z);
-					auto const SpawnedActorRef = GetWorld()->SpawnActor<ARabbitAgent>(RabbitActor, Loc, GetActorRotation());
-					SpawnedActorRef->hp = RABBIT_MAX_HUNGRY_HP_LEVEL;
-					Rabbits.Add(SpawnedActorRef);
-
-				}
-				UE_LOG(LogTemp, Warning, TEXT("I'm here"));
-
-			}
 		}
 	}
 
@@ -118,5 +112,44 @@ void ARabbitAgent::Move()
 	else {
 		Destroy();
 	}
+}
+
+void ARabbitAgent::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	Super::OnOverlapBegin(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+
+	if (Cast<APlantAgent>(OtherActor) == atractorPlant && atractorPlant)
+	{
+		atractorPlant->Destroy();
+		hp = RABBIT_MAX_HP;
+		atractorPlant = nullptr;
+		UE_LOG(LogTemp, Warning, TEXT("Some Rabbit warning castActor"));
+	}
+	else if (Cast<ARabbitAgent>(OtherActor) == atractorRabbit && atractorRabbit)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Some warning OtherActor"));
+
+		hp = RABBIT_MAX_HUNGRY_HP_LEVEL;
+		atractorRabbit->hp = RABBIT_MAX_HUNGRY_HP_LEVEL;
+		for (int j = 0; j < RABBIT_REPRODUCE_COUNT; j++) {
+
+			TArray<UStaticMeshComponent*> Components;
+
+			RabbitActor.GetDefaultObject()->GetComponents<UStaticMeshComponent>(Components);
+			ensure(Components.Num() > 0);
+
+			const FVector Loc(GetActorLocation().X + FMath::RandRange(-500, 500), GetActorLocation().Y + FMath::RandRange(-500, 500), GetActorLocation().Z);
+			auto const SpawnedActorRef = GetWorld()->SpawnActor<ARabbitAgent>(RabbitActor, Loc, GetActorRotation());
+			SpawnedActorRef->hp = RABBIT_MAX_HUNGRY_HP_LEVEL;
+		}
+	}
+
+}
+
+void ARabbitAgent::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex)
+{
+	Super::OnOverlapEnd(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex);
 }
 

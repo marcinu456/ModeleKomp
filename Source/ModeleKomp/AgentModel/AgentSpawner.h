@@ -36,7 +36,7 @@ private:
 	const size_t PLANT_REPRODUCE_TIME = 30;
 	const size_t PLANT_REPRODUCE_COUNT = 8;
 
-	const size_t RABBIT_COUNT = 8;
+	const size_t RABBIT_COUNT = 2;
 	const size_t RABBIT_MAX_HP = 300;
 	const size_t RABBIT_MAX_HUNGRY_HP_LEVEL = 150;
 	const double RABBIT_VELOCITY = 2.5;
