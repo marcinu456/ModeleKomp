@@ -42,4 +42,6 @@ public:
 
 	bool currentStatus = true;
 	int32 hp;
+protected:
+	virtual void Move() {};
 };

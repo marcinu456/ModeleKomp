@@ -15,4 +15,6 @@ class MODELEKOMP_API APlantAgent : public AAgentBase
 	GENERATED_BODY()
 public:
 	APlantAgent();
+
+
 };
