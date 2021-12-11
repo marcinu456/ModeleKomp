@@ -24,66 +24,99 @@ void ARabbitAgent::Move()
 {
 	Super::Move();
 
-	TArray<AActor*> Plants;
 
-	//TSubclassOf<APlantAgent> PlantActor;
-	//UGameplayStatics::GetAllActorsOfClass(GetWorld(), PlantActor, AllActors);
 
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlantAgent::StaticClass(), Plants);
-
-	//auto Plant = Cast<TArray<APlantAgent*>>(AllActors.GetData());
-
-	//TArray<APlantAgent*> Plants = AgentSpawner->GetPlants();
 	if (hp <= RABBIT_MAX_HUNGRY_HP_LEVEL) {
-			if (Plants.Num() > 0) {
-				size_t atractorIndex = 0;
-				auto atractor = Cast<APlantAgent>(Plants[atractorIndex])->GetActorLocation() - GetActorLocation();
-				float atractortDist = atractor.Size();// Plants[atractorIndex]->GetActorLocation(), rabbit->GetActorLocation());
-				for (int j = 1; j < Plants.Num(); j++) {
-					auto* plant = Cast<APlantAgent>(Plants[j]);
-					FVector vec = plant->GetActorLocation() - GetActorLocation();
-					float dist = vec.Size();// FVector::Distance(plant->GetActorLocation(), rabbit->GetActorLocation());
-					if (dist < atractortDist) {
-						atractorIndex = j;
-						atractor = vec;
-						atractortDist = dist;
-					}
+		TArray<AActor*> Plants;
+
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlantAgent::StaticClass(), Plants);
+		if (Plants.Num() > 0) {
+			size_t atractorIndex = 0;
+			auto atractor = Cast<APlantAgent>(Plants[atractorIndex])->GetActorLocation() - GetActorLocation();
+			float atractortDist = atractor.Size();// Plants[atractorIndex]->GetActorLocation(), rabbit->GetActorLocation());
+			for (int j = 1; j < Plants.Num(); j++) {
+				auto* plant = Cast<APlantAgent>(Plants[j]);
+				FVector vec = plant->GetActorLocation() - GetActorLocation();
+				float dist = vec.Size();// FVector::Distance(plant->GetActorLocation(), rabbit->GetActorLocation());
+				if (dist < atractortDist) {
+					atractorIndex = j;
+					atractor = vec;
+					atractortDist = dist;
 				}
-				UE_LOG(LogTemp, Warning, TEXT("atractor X=%f , Y=%f / atractortDist %f "), atractor.X, atractor.Y, atractortDist);
-				SetActorLocation(GetActorLocation() + atractor / atractortDist * RABBIT_VELOCITY);
-				UE_LOG(LogTemp, Warning, TEXT("Some warning message"));
-	
-				if ((GetActorLocation() - Plants[atractorIndex]->GetActorLocation()).Size() < SIZE) {
-					Plants.RemoveAt(atractorIndex);
-					hp = RABBIT_MAX_HP;
-				}
-	
+			}
+			//UE_LOG(LogTemp, Warning, TEXT("atractor X=%f , Y=%f / atractortDist %f "), atractor.X, atractor.Y, atractortDist);
+			SetActorLocation(GetActorLocation() + atractor / atractortDist * RABBIT_VELOCITY);
+			//UE_LOG(LogTemp, Warning, TEXT("Some warning message"));
+
+			if ((GetActorLocation() - Plants[atractorIndex]->GetActorLocation()).Size() < SIZE) {
+				Plants[atractorIndex]->Destroy();
+				Plants.RemoveAt(atractorIndex);
+
+				hp = RABBIT_MAX_HP;
+			}
+
+		}
+	}
+	else {
+		TArray<AActor*> Rabbits;
+
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARabbitAgent::StaticClass(), Rabbits);
+
+		int i = 0;
+		for (int j = 0; j < Rabbits.Num(); j++) {
+
+			if (Cast<ARabbitAgent>(Rabbits[j]) == this)
+			{
+				i = j;
+				break;
+			}
+
+		}
+
+
+		size_t atractorIndex = 0;
+		auto atractor = GetActorLocation();
+		float atractortDist = 1000;
+		for (int j = 1; j < Rabbits.Num(); j++) {
+			auto partner = Cast<ARabbitAgent>(Rabbits[j]);
+			auto vec = partner->GetActorLocation() - GetActorLocation();
+			float dist = vec.Size();
+			if (dist < atractortDist && partner->hp > RABBIT_MAX_HUNGRY_HP_LEVEL && j != i) {
+				atractorIndex = j;
+				atractor = vec;
+				atractortDist = dist;
 			}
 		}
-	//else {
-	//	size_t atractorIndex = i;
-	//	auto atractor = GetActorLocation();
-	//	float atractortDist = 1000;
-	//	for (int j = 1; j < Rabbits.Num(); j++) {
-	//		auto partner = Rabbits[j];
-	//		auto vec = partner->GetActorLocation() - GetActorLocation();
-	//		float dist = vec.Size();
-	//		if (dist < atractortDist && partner->hp > RABBIT_MAX_HUNGRY_HP_LEVEL && j != i) {
-	//			atractorIndex = j;
-	//			atractor = vec;
-	//			atractortDist = dist;
-	//		}
-	//	}
-	//	auto partner = Rabbits[atractorIndex];
-	//	if (this != &partner) {
-	//		SetActorLocation(GetActorLocation() + atractor / atractortDist * RABBIT_VELOCITY);
-	//		if ((GetActorLocation() - Rabbits[atractorIndex]->GetActorLocation()).Size() < SIZE) {
-	//			hp = RABBIT_MAX_HUNGRY_HP_LEVEL;
-	//			partner->hp = RABBIT_MAX_HUNGRY_HP_LEVEL;
-	//			/*for (int j = 0; j < RABBIT_REPRODUCE_COUNT; j++) {
-	//				Rabbits.push_back(Rabbit(ofVec2f(ofRandom(SIZE, 1000 - SIZE), ofRandom(SIZE, 1000 - SIZE)), RABBIT_MAX_HUNGRY_HP_LEVEL));
-	//			}*/
-	//		}
-	//	}
-	//}
+		auto partner = Cast<ARabbitAgent>(Rabbits[atractorIndex]);
+		if (this != partner) {
+			SetActorLocation(GetActorLocation() + atractor / atractortDist * RABBIT_VELOCITY);
+			if ((GetActorLocation() - Rabbits[atractorIndex]->GetActorLocation()).Size() < SIZE) {
+				hp = RABBIT_MAX_HUNGRY_HP_LEVEL;
+				partner->hp = RABBIT_MAX_HUNGRY_HP_LEVEL;
+				for (int j = 0; j < RABBIT_REPRODUCE_COUNT; j++) {
+
+					TArray<UStaticMeshComponent*> Components;
+
+					RabbitActor.GetDefaultObject()->GetComponents<UStaticMeshComponent>(Components);
+					ensure(Components.Num() > 0);
+
+					const FVector Loc(GetActorLocation().X + FMath::RandRange(-500, 500), GetActorLocation().Y + FMath::RandRange(-500, 500), GetActorLocation().Z);
+					auto const SpawnedActorRef = GetWorld()->SpawnActor<ARabbitAgent>(RabbitActor, Loc, GetActorRotation());
+					SpawnedActorRef->hp = RABBIT_MAX_HUNGRY_HP_LEVEL;
+					Rabbits.Add(SpawnedActorRef);
+
+				}
+				UE_LOG(LogTemp, Warning, TEXT("I'm here"));
+
+			}
+		}
+	}
+
+	if (hp != 0) {
+		hp--;
+	}
+	else {
+		Destroy();
+	}
 }
+

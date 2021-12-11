@@ -31,4 +31,6 @@ private:
 
 	const double SIZE = 10;
 
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true", Category = "Grid Setup"))
+		TSubclassOf<ARabbitAgent> RabbitActor;
 };
