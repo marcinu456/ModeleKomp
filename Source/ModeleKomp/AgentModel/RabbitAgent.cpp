@@ -129,7 +129,6 @@ void ARabbitAgent::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* O
 	else if (Cast<ARabbitAgent>(OtherActor) == atractorRabbit && atractorRabbit)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Some warning OtherActor"));
-
 		hp = RABBIT_MAX_HUNGRY_HP_LEVEL;
 		atractorRabbit->hp = RABBIT_MAX_HUNGRY_HP_LEVEL;
 		for (int j = 0; j < RABBIT_REPRODUCE_COUNT; j++) {
@@ -143,6 +142,8 @@ void ARabbitAgent::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* O
 			auto const SpawnedActorRef = GetWorld()->SpawnActor<ARabbitAgent>(RabbitActor, Loc, GetActorRotation());
 			SpawnedActorRef->hp = RABBIT_MAX_HUNGRY_HP_LEVEL;
 		}
+		atractorRabbit = nullptr;
+
 	}
 
 }
@@ -151,5 +152,16 @@ void ARabbitAgent::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* Oth
 	int32 OtherBodyIndex)
 {
 	Super::OnOverlapEnd(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex);
+
+	if (Cast<APlantAgent>(OtherActor) == atractorPlant && atractorPlant)
+	{
+		atractorPlant = nullptr;
+
+	}
+	else if (Cast<ARabbitAgent>(OtherActor) == atractorRabbit && atractorRabbit)
+	{
+		atractorRabbit = nullptr;
+	}
+
 }
 

@@ -40,18 +40,16 @@ private:
 	const size_t RABBIT_MAX_HP = 300;
 	const size_t RABBIT_MAX_HUNGRY_HP_LEVEL = 150;
 	const double RABBIT_VELOCITY = 2.5;
-	const double RABBIT_REPRODUCE_COUNT = 4;
 
 	const size_t WOLF_COUNT = 4;
 	const size_t WOLF_MAX_HP = 500;
 	const size_t WOLF_MAX_HUNGRY_HP_LEVEL = 150;
 	const double WOLF_VELOCITY = 2;
-	const double WOLF_REPRODUCE_COUNT = 1;
 
 
-	TArray<APlantAgent*> Plants;
-	TArray<ARabbitAgent*> Rabbits;
-	TArray<AWolfAgent*> Wolfes;
+	//TArray<APlantAgent*> Plants;
+	//TArray<ARabbitAgent*> Rabbits;
+	//TArray<AWolfAgent*> Wolfes;
 
 
 	/** Class for cell. */

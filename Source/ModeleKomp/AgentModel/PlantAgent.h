@@ -16,5 +16,6 @@ class MODELEKOMP_API APlantAgent : public AAgentBase
 public:
 	APlantAgent();
 
+	virtual void Tick(float DeltaTime) override;
 
 };
