@@ -3,25 +3,38 @@
 
 #include "GameOfLifeState.h"
 
+#include "Kismet/GameplayStatics.h"
+
 void AGameOfLifeState::BeginPlay()
 {
 	Super::BeginPlay();
 
-	for (FTransform T : Transforms) {
-		GridActors.Add(GetWorld()->SpawnActor<AGridActor>(GridActor, T));
+	TArray<AActor*> Rabbits;
+
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AGridActor3D::StaticClass(), Rabbits);
+
+
+	for (auto& Rabbit : Rabbits)
+	{
+		GridActors.Add(Cast<AGridActor3D>(Rabbit));
 	}
+
+
+	/*for (FTransform T : Transforms) {
+		GridActors.Add(GetWorld()->SpawnActor<AGridActor3D>(GridActor, T));
+	}*/
 
 	EditMode = true;
 }
 
 void AGameOfLifeState::SetEditMode(const bool Editing) {
 	if (Editing) {
-		for (AGridActor* Grid : GridActors) {
+		for (AGridActor3D* Grid : GridActors) {
 			Grid->ToEditMode();
 		}
 	}
 	else {
-		for (AGridActor* Grid : GridActors) {
+		for (AGridActor3D* Grid : GridActors) {
 			Grid->ToPlayMode();
 		}
 	}
@@ -29,19 +42,19 @@ void AGameOfLifeState::SetEditMode(const bool Editing) {
 }
 
 void AGameOfLifeState::StartTimers() {
-	for (AGridActor* Grid : GridActors) {
+	for (AGridActor3D* Grid : GridActors) {
 		Grid->StartTimer();
 	}
 }
 
 void AGameOfLifeState::ClearTimers() {
-	for (AGridActor* Grid : GridActors) {
+	for (AGridActor3D* Grid : GridActors) {
 		Grid->ClearTimer();
 	}
 }
 
 void AGameOfLifeState::Reset() {
-	for (AGridActor* Grid : GridActors) {
+	for (AGridActor3D* Grid : GridActors) {
 		Grid->Reset();
 	}
 	SetEditMode(true);

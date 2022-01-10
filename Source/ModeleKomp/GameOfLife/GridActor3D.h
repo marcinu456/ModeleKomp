@@ -2,11 +2,36 @@
 //TODO zrób logikę do wersji 3D
 #pragma once
 
+#include <vector>
+
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GridActor3D.generated.h"
 
 class ACellActor;
+
+
+USTRUCT()
+struct FCellArrayZ
+{
+	GENERATED_USTRUCT_BODY()
+
+		UPROPERTY()
+		TArray<ACellActor*> CellY;
+
+};
+
+USTRUCT()
+struct FCellArrayY
+{
+	GENERATED_USTRUCT_BODY()
+
+		UPROPERTY()
+		TArray<FCellArrayZ> CellZ;
+
+};
+
+
 UCLASS()
 class MODELEKOMP_API AGridActor3D : public AActor
 {
@@ -42,12 +67,12 @@ private:
 	/**
 	* Counts the number of alive neighbors for the cell at index j + i * width.
 	*/
-	int CountAliveNeighbors(const int i, const int j);
+	int32 CountAliveNeighbors(const int32 i, const int32 j, const int32 k);
 
 	/**
 	* Updates the cells' AliveNext field based on the rules of the game.
 	*/
-	void UpdateAliveNext(const int Index, const int NumAliveNeighbors);
+	void UpdateAliveNext(const int32 i, const int32 j, const int32 k, const int32 NumAliveNeighbors);
 
 	/**
 	* Populates the AliveNext field of all the cells in the grid to be able to advance to the next generation.
@@ -60,7 +85,8 @@ private:
 	void UpdateNext();
 
 
-	TArray<ACellActor*> CellActors; //row-major
+	std::vector<std::vector<std::vector<ACellActor*>>> CellActors3D; //row-major
+	//TArray<ACellActor*> CellActors; //row-major
 
 	/** Width of grid in number of cells. */
 	UPROPERTY(EditAnywhere, meta = (ClampMin = "1", AllowPrivateAccess = "true", Category = "Grid Setup"))

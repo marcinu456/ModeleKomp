@@ -37,6 +37,20 @@ public:
 
 	void Reset();
 
+	void SetXYZ(int32 _X, int32 _Y, int32 _Z)
+	{
+		X = _X;
+		Y = _Y;
+		Z = _Z;
+	}
+
+	void GetXYZ(int32& _X, int32& _Y, int32& _Z)
+	{
+		_X = X;
+		_Y = Y;
+		_Z = Z;
+	}
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -48,8 +62,9 @@ private:
 	UFUNCTION()
 		void EndCursorOver();
 
-
+	UPROPERTY(EditAnywhere, Category = "Settings")
 	mutable bool Alive;
+
 	bool AliveNext;
 
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
@@ -64,5 +79,12 @@ private:
 	/** Material for when the cell is not alive in edit mode. */
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true", Category = "Materials"))
 		UMaterialInterface* EndCursorOverMaterial;
+
+	UPROPERTY(EditAnywhere, Category = "Settings")
+		int32 X;
+	UPROPERTY(EditAnywhere, Category = "Settings")
+		int32 Y;
+	UPROPERTY(EditAnywhere, Category = "Settings")
+		int32 Z;
 
 };

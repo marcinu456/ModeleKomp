@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GridActor.h"
+#include "GridActor3D.h"
 #include "GameFramework/GameStateBase.h"
 #include "GameOfLifeState.generated.h"
 
@@ -37,7 +37,7 @@ protected:
 
 private:
 	bool EditMode;
-	TArray<AGridActor*> GridActors; //row-major
+	TArray<AGridActor3D*> GridActors; //row-major
 
 	/** Time before the grid advances to the next generation. */
 	UPROPERTY(EditAnywhere, meta = (ClampMin = "0.1", ClampMax = "10.0", AllowPrivateAccess = "true", Category = "Level Setup"))
@@ -47,6 +47,6 @@ private:
 		TArray<FTransform> Transforms;
 	/** Class for grid. */
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true", Category = "Level Setup"))
-		TSubclassOf<AGridActor> GridActor;
+		TSubclassOf<AGridActor3D> GridActor;
 
 };
