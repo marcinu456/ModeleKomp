@@ -73,7 +73,7 @@ int32 AGridActor3D::CountAliveNeighbors(const int32 i, const int32 j, const int3
 	return NumAliveNeighbors;
 }
 
-
+//TODO wszystko to do vr i dodaj tam player controler do testów
 //TODO change rules http://cs.brown.edu/courses/cs195v/projects/life/edwallac/index.html
 void AGridActor3D::UpdateAliveNext(const int32 i, const int32 j, const int32 k, const int32 NumAliveNeighbors) {
 	const bool IsAlive = CellActors3D[i][j][k]->GetAlive();
